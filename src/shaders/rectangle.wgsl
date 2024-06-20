@@ -33,8 +33,7 @@ fn vertex_index_to_quad_ndc(vertext_index: u32) -> vec2f {
 fn rectangle_sdf(dimensions: vec2<f32>, frag_coord: vec2<f32>) -> f32 {
     let offset = abs(frag_coord) - dimensions;
 
-    return length(max(offset, vec2<f32>(0.0)) + min(max(offset.x, offset.y), 0.0));
-
+    return length(max(offset, vec2<f32>(0.0))) + min(max(offset.x, offset.y), 0.0);
 }
 
 @vertex
@@ -48,8 +47,16 @@ fn vertex_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
 
 @fragment
 fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
+    let outer_color = vec3<f32>(0.8, 0.4, 0.2);
+    let inner_color = vec3<f32>(0.2, 0.4, 0.8);
+    var color: vec3<f32> = outer_color;
+
     let distance = rectangle_sdf(vec2<f32>(160.0, 120.0), input.builtin_position.xy - vec2<f32>(320.0, 240.0));
 
-    return vec4<f32>(vec3<f32>(0.8, 0.4, 0.2), smoothstep(1.0, 0.0, distance * 0.04));
+    if distance < 0.0 {
+        color = inner_color;
+    }
+
+    return vec4<f32>(color, smoothstep(1.0, 0.0, abs(distance) * 0.04));
 }
 
