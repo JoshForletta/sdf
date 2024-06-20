@@ -84,6 +84,9 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
         color = inner_color;
     }
 
-    return vec4<f32>(color, smoothstep(1.0, 0.0, abs(distance) * 0.04));
+    let alpha = (sin(distance * 0.5) + 1) / 2;
+    let fade = 1.0 / abs(distance * 0.02);
+
+    return vec4<f32>(color, alpha * fade);
 }
 
