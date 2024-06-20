@@ -30,10 +30,32 @@ fn vertex_index_to_quad_ndc(vertext_index: u32) -> vec2f {
     return quad[vertext_index];
 }
 
-fn rectangle_sdf(dimensions: vec2<f32>, frag_coord: vec2<f32>) -> f32 {
-    let offset = abs(frag_coord) - dimensions;
+fn select_corner_radius(corner_radii: vec4<f32>, point: vec2<f32>) -> f32 {
+    var right = mix(
+        corner_radii.x, // top-right
+        corner_radii.y, // bottom-right
+        step(0.0, point.y)
+    );
+    var left = mix(
+        corner_radii.z, // top-left
+        corner_radii.w, // bottom-left
+        step(0.0, point.y)
+    );
 
-    return length(max(offset, vec2<f32>(0.0))) + min(max(offset.x, offset.y), 0.0);
+    return mix(left, right, step(0.0, point.x));
+}
+
+fn rectangle_sdf(
+    position: vec2<f32>,
+    dimensions: vec2<f32>,
+    corner_radii: vec4<f32>,
+    frag_coord: vec2<f32>
+) -> f32 {
+    var point = frag_coord - position;
+    let corner_radius = select_corner_radius(corner_radii, point);
+    let offset = abs(point) - dimensions + corner_radius;
+
+    return length(max(offset, vec2<f32>(0.0))) + min(max(offset.x, offset.y), 0.0) - corner_radius;
 }
 
 @vertex
@@ -51,7 +73,12 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
     let inner_color = vec3<f32>(0.2, 0.4, 0.8);
     var color: vec3<f32> = outer_color;
 
-    let distance = rectangle_sdf(vec2<f32>(160.0, 120.0), input.builtin_position.xy - vec2<f32>(320.0, 240.0));
+    let distance = rectangle_sdf(
+        vec2<f32>(320.0, 240.0),
+        vec2<f32>(160.0, 120.0),
+        vec4<f32>(30.0),
+        input.builtin_position.xy
+    );
 
     if distance < 0.0 {
         color = inner_color;
