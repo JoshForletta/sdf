@@ -30,6 +30,7 @@ pub struct RectangleRenderer<'window> {
     globals: Globals,
     globals_buffer: wgpu::Buffer,
     globals_bind_group: wgpu::BindGroup,
+    dirty: bool,
     render_pipeline: wgpu::RenderPipeline,
 }
 
@@ -118,8 +119,15 @@ impl<'window> RectangleRenderer<'window> {
             globals,
             globals_buffer,
             globals_bind_group,
+            dirty: false,
             render_pipeline,
         }
+    }
+
+    pub fn set_phase(&mut self, phase: f32) {
+        self.globals.rectangle.phase = phase;
+
+        self.dirty = true;
     }
 
     pub fn resize(&mut self, width: u32, height: u32) {
@@ -129,7 +137,8 @@ impl<'window> RectangleRenderer<'window> {
         self.globals.view_projection = self.device.view_projection();
 
         self.configure_surface();
-        self.write_globals();
+
+        self.dirty = true;
     }
 
     pub fn configure_surface(&self) {
@@ -147,6 +156,8 @@ impl<'window> RectangleRenderer<'window> {
     }
 
     pub fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
+        self.dirty.then(|| self.write_globals());
+
         let mut encoder = self
             .device
             .device
