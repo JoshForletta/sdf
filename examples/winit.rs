@@ -47,6 +47,8 @@ fn main() {
         corner_radii: (0.0, 0.0, 0.0, 0.0).into(),
         inner_color: (0.2, 0.4, 0.8, 1.0).into(),
         outer_color: (0.8, 0.4, 0.2, 1.0).into(),
+        phase: 0.0,
+        _padding: [0; 3],
     };
 
     let mut renderer = RectangleRenderer::new(

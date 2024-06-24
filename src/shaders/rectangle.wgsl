@@ -9,6 +9,7 @@ struct Globals {
     corner_radii: vec4<f32>,
     outer_color: vec4<f32>,
     inner_color: vec4<f32>,
+    phase: f32,
 }
 
 @group(0) @binding(0) var<uniform> globals: Globals;
@@ -87,7 +88,7 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
         color = inner_color;
     }
 
-    let alpha = (sin(distance * 0.5) + 1) / 2;
+    let alpha = (sin(distance * 0.5 + globals.phase) + 1) / 2;
     let fade = 1.0 / abs(distance * 0.02);
 
     return vec4<f32>(color, alpha * fade);

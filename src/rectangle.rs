@@ -11,6 +11,8 @@ pub struct Rectangle {
     pub corner_radii: Vector4<f32>,
     pub outer_color: Vector4<f32>,
     pub inner_color: Vector4<f32>,
+    pub phase: f32,
+    pub _padding: [u32; 3],
 }
 
 #[repr(C)]
