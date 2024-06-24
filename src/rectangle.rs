@@ -1,14 +1,23 @@
-use cgmath::{Matrix4, Vector2};
+use cgmath::{Matrix4, Vector2, Vector4};
 use wgpu::util::DeviceExt;
 
 use crate::Device;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Rectangle {
+    pub position: Vector2<f32>,
+    pub half_dimensions: Vector2<f32>,
+    pub corner_radii: Vector4<f32>,
+    pub outer_color: Vector4<f32>,
+    pub inner_color: Vector4<f32>,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 struct Globals {
     view_projection: Matrix4<f32>,
-    position: Vector2<u32>,
-    half_dimensions: Vector2<u32>,
+    rectangle: Rectangle,
 }
 
 unsafe impl bytemuck::Zeroable for Globals {}
@@ -23,15 +32,10 @@ pub struct RectangleRenderer<'window> {
 }
 
 impl<'window> RectangleRenderer<'window> {
-    pub fn new(device: Device<'window>, width: u32, height: u32) -> Self {
+    pub fn new(device: Device<'window>, rectangle: Rectangle) -> Self {
         let globals = Globals {
             view_projection: device.view_projection(),
-            position: (
-                device.surface_config.width / 2,
-                device.surface_config.height / 2,
-            )
-                .into(),
-            half_dimensions: (width / 2, height / 2).into(),
+            rectangle,
         };
 
         let globals_buffer = device

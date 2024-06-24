@@ -1,4 +1,7 @@
-use sdf::{rectangle::RectangleRenderer, Device};
+use sdf::{
+    rectangle::{Rectangle, RectangleRenderer},
+    Device,
+};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
@@ -38,10 +41,17 @@ fn main() {
     );
     let window = window_builder.build(&event_loop).unwrap();
 
+    let rectangle = Rectangle {
+        position: (320.0, 240.0).into(),
+        half_dimensions: (160.0, 120.0).into(),
+        corner_radii: (0.0, 0.0, 0.0, 0.0).into(),
+        inner_color: (0.2, 0.4, 0.8, 1.0).into(),
+        outer_color: (0.8, 0.4, 0.2, 1.0).into(),
+    };
+
     let mut renderer = RectangleRenderer::new(
         futures::executor::block_on(Device::new(width, height, &window)).unwrap(),
-        320,
-        240,
+        rectangle,
     );
 
     event_loop

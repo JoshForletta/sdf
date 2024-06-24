@@ -1,5 +1,6 @@
 use cgmath::Matrix4;
 
+pub use cgmath;
 pub mod rectangle;
 
 pub struct Device<'window> {

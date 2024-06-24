@@ -4,8 +4,11 @@ struct VertexOutput {
 
 struct Globals {
     view_projection: mat4x4<f32>,
-    position_fbc: vec2<f32>,
-    dimensions_fbc: vec2<f32>,
+    position: vec2<f32>,
+    dimensions: vec2<f32>,
+    corner_radii: vec4<f32>,
+    outer_color: vec4<f32>,
+    inner_color: vec4<f32>,
 }
 
 @group(0) @binding(0) var<uniform> globals: Globals;
@@ -74,10 +77,10 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
     var color: vec3<f32> = outer_color;
 
     let distance = rectangle_sdf(
-        vec2<f32>(320.0, 240.0),
-        vec2<f32>(160.0, 120.0),
-        vec4<f32>(30.0),
-        input.builtin_position.xy
+        globals.position,
+        globals.dimensions,
+        globals.corner_radii,
+        input.builtin_position.xy,
     );
 
     if distance < 0.0 {
