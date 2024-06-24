@@ -73,9 +73,7 @@ fn vertex_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
 
 @fragment
 fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
-    let outer_color = vec3<f32>(0.8, 0.4, 0.2);
-    let inner_color = vec3<f32>(0.2, 0.4, 0.8);
-    var color: vec3<f32> = outer_color;
+    var color: vec4<f32>;
 
     let distance = rectangle_sdf(
         globals.position,
@@ -84,13 +82,19 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
         input.builtin_position.xy,
     );
 
+    var angle = distance * 0.5;
+
     if distance < 0.0 {
-        color = inner_color;
+        color = globals.inner_color;
+        angle += globals.phase;
+    } else {
+        color = globals.outer_color;
+        angle -= globals.phase;
     }
 
-    let alpha = (sin(distance * 0.5 + globals.phase) + 1) / 2;
+    let alpha = (sin(angle) + 1) / 2;
     let fade = 1.0 / abs(distance * 0.02);
 
-    return vec4<f32>(color, alpha * fade);
+    return vec4<f32>(color.rgb, color.a * alpha * fade);
 }
 
