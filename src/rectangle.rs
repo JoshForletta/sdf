@@ -98,6 +98,7 @@ impl<'window> RectangleRenderer<'window> {
                         module: &shader_module,
                         entry_point: "vertex_main",
                         buffers: &[],
+                        compilation_options: Default::default(),
                     },
                     primitive: wgpu::PrimitiveState::default(),
                     depth_stencil: None,
@@ -110,6 +111,7 @@ impl<'window> RectangleRenderer<'window> {
                             blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                             write_mask: wgpu::ColorWrites::ALL,
                         })],
+                        compilation_options: Default::default(),
                     }),
                     multiview: None,
                 });
